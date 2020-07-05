@@ -298,42 +298,72 @@ namespace BleedOutPlugin
 
         private string GetUsageBo()
         {
-            return " Usage: bo <id/nickname> <seconds> <damage> <bloodsize>";
+            return " Usage: bo <id/nickname> <seconds> <damage> <bloodsize> | bo <id/nickname> remove";
         }
 
         public void OnRemoveAdminCommand(ref RACommandEvent ev)
         {
             string[] args = ev.Command.Split(' ');
 
-            if (args[0] != "bo")
+            if (args.Length == 0 || args[0] != "bo")
                 return;
-            if (args.Length != 5)
+            if (args.Length == 3)
+            {
+                ReferenceHub referenceHub = Player.GetPlayer(args[1]);
+                if (referenceHub == null)
+                {
+                    ev.Sender.RAMessage("Player not found" + GetUsageBo());
+                    return;
+                }
+                if (args[2].ToLower() == "remove")
+                {
+                    if (referenceHub.GetComponent<BleedOutComponent>())
+                    {
+                        UnityEngine.Object.Destroy(referenceHub.GetComponent<BleedOutComponent>());
+                        ev.Sender.RAMessage("Remove bleedoutcomponent from " + referenceHub.nicknameSync.Network_myNickSync);
+                        return;
+                    }
+                    else
+                    {
+                        ev.Sender.RAMessage(referenceHub.nicknameSync.Network_myNickSync + " do not have bleedoutcomponent");
+                        return;
+                    }
+                }
+                else
+                {
+                    ev.Sender.RAMessage("Out of args." + GetUsageBo());
+                    return;
+                }
+            }
+            else if (args.Length == 5)
+            {
+                ReferenceHub referenceHub = Player.GetPlayer(args[1]);
+                if (referenceHub == null)
+                {
+                    ev.Sender.RAMessage("Player not found" + GetUsageBo());
+                    return;
+                }
+                if (!int.TryParse(args[2], out int seconds) || !int.TryParse(args[3], out int damage) || !float.TryParse(args[4], out float size) || seconds < 0 || damage < 0 || size < 0.0f)
+                {
+                    ev.Sender.RAMessage("Only positive numbers" + GetUsageBo());
+                    return;
+                }
+                if (referenceHub.GetComponent<BleedOutComponent>())
+                    UnityEngine.Object.Destroy(referenceHub.GetComponent<BleedOutComponent>());
+                BleedOutComponent bleedOutComponent = referenceHub.gameObject.AddComponent<BleedOutComponent>();
+                bleedOutComponent.damageType = DamageTypes.E11StandardRifle;
+                bleedOutComponent.damage = damage;
+                bleedOutComponent.timeout = seconds;
+                bleedOutComponent.bloodSize = size;
+
+                ev.Sender.RAMessage("Add bleedoutcomponent to " + referenceHub.nicknameSync.Network_myNickSync);
+                return;
+            }
+            else
             {
                 ev.Sender.RAMessage("Out of args." + GetUsageBo());
                 return;
             }
-
-            ReferenceHub referenceHub = Player.GetPlayer(args[1]);
-            if (referenceHub == null)
-            {
-                ev.Sender.RAMessage("Player not found" + GetUsageBo());
-                return;
-            }
-            if (!int.TryParse(args[2], out int seconds) || !int.TryParse(args[3], out int damage) || !float.TryParse(args[4], out float size) || seconds < 0 || damage < 0 || size < 0.0f)
-            {
-                ev.Sender.RAMessage("Only positive numbers" + GetUsageBo());
-                return;
-            }
-            if (referenceHub.GetComponent<BleedOutComponent>())
-                UnityEngine.Object.Destroy(referenceHub.GetComponent<BleedOutComponent>());
-            BleedOutComponent bleedOutComponent = referenceHub.gameObject.AddComponent<BleedOutComponent>();
-            bleedOutComponent.damageType = DamageTypes.E11StandardRifle;
-            bleedOutComponent.damage = damage;
-            bleedOutComponent.timeout = seconds;
-            bleedOutComponent.bloodSize = size;
-
-            ev.Sender.RAMessage("Add bleedoutcomponent to " + referenceHub.nicknameSync.Network_myNickSync);
-            return;
         }
 
         public bool GetMiner(DamageTypes.DamageType damageType)
