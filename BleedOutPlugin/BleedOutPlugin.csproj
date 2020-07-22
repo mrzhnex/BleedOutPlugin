@@ -71,8 +71,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BleedOutComponent.cs" />
-    <Compile Include="BleedOutEventHandler.cs" />
-    <Compile Include="BleedOutPlugin.cs" />
+    <Compile Include="SetEvents.cs" />
+    <Compile Include="MainSettings.cs" />
     <Compile Include="CooldownStopBleed.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

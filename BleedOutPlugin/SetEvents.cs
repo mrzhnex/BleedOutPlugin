@@ -4,7 +4,7 @@ using System;
 
 namespace BleedOutPlugin
 {
-    public class BleedOutEventHandler
+    public class SetEvents
     {
         private readonly Random Random = new Random();
         public void OnMedkitUse(UsedMedicalItemEvent ev)
@@ -298,7 +298,7 @@ namespace BleedOutPlugin
 
         private string GetUsageBo()
         {
-            return " Usage: bo <id/nickname> <seconds> <damage> <bloodsize> | bo <id/nickname> remove";
+            return "Usage: bo <id/nickname> <seconds> <damage> <bloodsize> | bo <id/nickname> remove";
         }
 
         public void OnRemoveAdminCommand(ref RACommandEvent ev)
@@ -307,12 +307,13 @@ namespace BleedOutPlugin
 
             if (args.Length == 0 || args[0] != "bo")
                 return;
+            ev.Allow = false;
             if (args.Length == 3)
             {
                 ReferenceHub referenceHub = Player.GetPlayer(args[1]);
                 if (referenceHub == null)
                 {
-                    ev.Sender.RAMessage("Player not found" + GetUsageBo());
+                    ev.Sender.RAMessage("Player not found. " + GetUsageBo());
                     return;
                 }
                 if (args[2].ToLower() == "remove")
@@ -331,7 +332,7 @@ namespace BleedOutPlugin
                 }
                 else
                 {
-                    ev.Sender.RAMessage("Out of args." + GetUsageBo());
+                    ev.Sender.RAMessage("Out of args. " + GetUsageBo());
                     return;
                 }
             }
@@ -340,12 +341,12 @@ namespace BleedOutPlugin
                 ReferenceHub referenceHub = Player.GetPlayer(args[1]);
                 if (referenceHub == null)
                 {
-                    ev.Sender.RAMessage("Player not found" + GetUsageBo());
+                    ev.Sender.RAMessage("Player not found. " + GetUsageBo());
                     return;
                 }
                 if (!int.TryParse(args[2], out int seconds) || !int.TryParse(args[3], out int damage) || !float.TryParse(args[4], out float size) || seconds < 0 || damage < 0 || size < 0.0f)
                 {
-                    ev.Sender.RAMessage("Only positive numbers" + GetUsageBo());
+                    ev.Sender.RAMessage("Only positive numbers. " + GetUsageBo());
                     return;
                 }
                 if (referenceHub.GetComponent<BleedOutComponent>())
@@ -361,7 +362,7 @@ namespace BleedOutPlugin
             }
             else
             {
-                ev.Sender.RAMessage("Out of args." + GetUsageBo());
+                ev.Sender.RAMessage("Out of args. " + GetUsageBo());
                 return;
             }
         }
